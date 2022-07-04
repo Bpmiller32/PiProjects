@@ -65,6 +65,7 @@ output = str(sensor.temp) + ',' + str(sensor.pressure) + ',' + str(sensor.humidi
                 returnedVariableName: "output"
             );
 
+            // Only able export primitive types from Python.Net so I sent back a delimited string to have only 1 Python execution, separate and assign values
             string[] sensorValues = test.Split(',');
 
             double rawTemp = double.Parse(sensorValues[0]);
@@ -92,6 +93,7 @@ output = str(sensor.temp) + ',' + str(sensor.pressure) + ',' + str(sensor.humidi
             double dewPoint = rawTemp - ((100 - rawHumidity) / 5);
             Humidity = 100 - (5 * (compTempC - dewPoint));
 
+            // Debug output
             logger.LogDebug("Compensated temperature: {CompTempF} *F", CompTempF);
             logger.LogDebug("Pressure: {Pressure} hPa", Pressure);
             logger.LogDebug("Humidity: {Humidity} %", Humidity);

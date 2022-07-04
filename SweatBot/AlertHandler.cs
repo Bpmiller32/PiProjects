@@ -13,6 +13,7 @@ public class AlertHandler
     private readonly SensorReader sensorReader;
 
     private int missedPings = 0;
+    private bool pingsEnabled = true;
     private int alertCount = 0;
     private bool alertsEnabled = true;
     private readonly double maxTemp;
@@ -50,10 +51,15 @@ public class AlertHandler
     {
         try
         {
+            if (!pingsEnabled)
+            {
+                return;
+            }
+
             if (missedPings > 30)
             {
                 logger.LogError("Was not able to reach canary server or service for over 3 minutes, stopping pings");
-                return;
+                pingsEnabled = false;
             }
 
             HttpRequestMessage request = new()
@@ -110,10 +116,6 @@ public class AlertHandler
             smtp.Authenticate("billy.miller@raf.com", "wwnhkmhjctfttfjf");
             smtp.Send(email);
             smtp.Disconnect(true);
-        }
-        catch (System.NullReferenceException e)
-        {
-            logger.LogWarning("Check that email list in appsettings.json is not blank: {e}", e.Message);
         }
         catch (System.Exception e)
         {

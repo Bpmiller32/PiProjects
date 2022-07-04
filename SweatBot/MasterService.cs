@@ -24,7 +24,13 @@ public class MasterService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        // Kick off SensorReader, polls temp every ~8s from BME280
+        // Validate appsettings
+        if (!ValidateSettings())
+        {
+            return;
+        }
+
+        // Kick off SensorReader, time to pull all info from sensor is ~8s
         _ = Task.Run(() => sensorReader.ExecuteAsync(stoppingToken), stoppingToken);
 
         // Grab temp thresholds from appsettings.json
@@ -48,6 +54,37 @@ public class MasterService : BackgroundService
 
             _ = alertHandler.SendCanary();
             await Task.Delay(TimeSpan.FromSeconds(POLLING_RATE), stoppingToken);
+        }
+    }
+
+    private bool ValidateSettings()
+    {
+        try
+        {
+            // Check that appsettings.json exists at all
+            if (!File.Exists(Path.Combine(Directory.GetCurrentDirectory(), "appsettings.json")))
+            {
+                throw new Exception("appsettings.json is missing, make sure there is a valid appsettings.json file in the same directory as the application");
+            }
+            // Check emailList
+            if (string.IsNullOrEmpty(config.GetValue<string>("settings:emailList")))
+            {
+                throw new Exception("emailList value is either missing or invalid in appsettings.json");
+            }
+
+            // Check maxTemp
+            int maxTemp = config.GetValue<int>("settings:maxTemp");
+            if (maxTemp == 0)
+            {
+                throw new Exception("maxTemp value is either missing or invalid in appsettings.json");
+            }
+
+            return true;
+        }
+        catch (System.Exception e)
+        {
+            logger.LogError("{e}", e.Message);
+            return false;
         }
     }
 }
