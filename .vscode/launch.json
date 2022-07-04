@@ -1,0 +1,39 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "CanaryServer",
+            "type": "coreclr",
+            "logging": {"moduleLoad": false},
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/CanaryServer/bin/Debug/net6.0/CanaryServer.dll",
+            "args": [],
+        },
+        {
+            "name": "SweatBot",
+            "type": "coreclr",
+            "logging": {"moduleLoad": false},
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "/usr/local/bin/dotnet",
+            "args": [
+                "/home/pi/SweatBotDebug/SweatBot.dll"
+            ],
+            "pipeTransport": {
+                "pipeCwd": "C:\\",
+                "pipeProgram": "C:\\Windows\\System32\\OpenSSH\\ssh.exe",
+                "pipeArgs": [
+                    "pi@192.168.50.183"
+                ],
+                "debuggerPath": "~/vsdbg/vsdbg"
+            }
+        },
+    ],
+    "compounds": [
+        {
+            "name": "SweatBot + CanaryServer",
+            "configurations": ["CanaryServer", "SweatBot"]
+        }
+    ]
+}
