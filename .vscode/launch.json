@@ -21,7 +21,6 @@
                 "/home/pi/SweatBotDebug/SweatBot.dll"
             ],
             "pipeTransport": {
-                "pipeCwd": "C:\\",
                 "pipeProgram": "C:\\Windows\\System32\\OpenSSH\\ssh.exe",
                 "pipeArgs": [
                     "pi@192.168.50.183"

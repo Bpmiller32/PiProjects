@@ -33,11 +33,10 @@ public class MasterService : BackgroundService
         // Kick off SensorReader, time to pull all info from sensor is ~8s
         _ = Task.Run(() => sensorReader.ExecuteAsync(stoppingToken), stoppingToken);
 
-        // Grab temp thresholds from appsettings.json
-        double maxTemp = config.GetValue<double>("settings:maxTemp");
-
         // Start main loop
+        logger.LogInformation("✦✧✦✧✦✧✦✧✦✧✦✧✦✧✦✧✦✧✦✧");
         logger.LogInformation("Starting service, getting average CPU temp over 10s.....");
+        logger.LogDebug("I am running from: {System}", System.AppDomain.CurrentDomain.BaseDirectory);
         while (!stoppingToken.IsCancellationRequested)
         {
             if (sensorReader.CompTempF == 0)
@@ -47,12 +46,20 @@ public class MasterService : BackgroundService
                 continue;
             }
 
+            // Grab temp threshold from appsettings.json, check if sensor reading is above threshold
+            double maxTemp = config.GetValue<double>("settings:maxTemp");
             if (sensorReader.CompTempF > maxTemp)
             {
                 _ = alertHandler.RaiseAlert(nextNotification: NOTIFICATION_RATE);
             }
 
-            _ = alertHandler.SendCanary();
+            // Check to see if canary service is enabled
+            bool canaryEnabled = config.GetValue<bool>("settings:canaryEnabled");
+            if (canaryEnabled)
+            {
+                _ = alertHandler.SendCanary();
+            }
+
             await Task.Delay(TimeSpan.FromSeconds(POLLING_RATE), stoppingToken);
         }
     }
@@ -71,9 +78,8 @@ public class MasterService : BackgroundService
             {
                 throw new Exception("emailList value is either missing or invalid in appsettings.json");
             }
-
             // Check maxTemp
-            int maxTemp = config.GetValue<int>("settings:maxTemp");
+            double maxTemp = config.GetValue<double>("settings:maxTemp");
             if (maxTemp == 0)
             {
                 throw new Exception("maxTemp value is either missing or invalid in appsettings.json");

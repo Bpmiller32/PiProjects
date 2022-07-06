@@ -12,7 +12,7 @@ try
         .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
         .MinimumLevel.Override("System", LogEventLevel.Warning)
         .WriteTo.Console(new ExpressionTemplate("[{@t:MM-dd-yyyy HH:mm:ss} {Substring(SourceContext, LastIndexOf(SourceContext, '.') + 1)}] [{@l:u3}] {@m}\n{@x}"))
-        .WriteTo.File(new ExpressionTemplate("[{@t:MM-dd-yyyy HH:mm:ss} {Substring(SourceContext, LastIndexOf(SourceContext, '.') + 1)}] [{@l:u3}] {@m}\n{@x}"), @".\SweatbotLog.txt")
+        .WriteTo.File(new ExpressionTemplate("[{@t:MM-dd-yyyy HH:mm:ss} {Substring(SourceContext, LastIndexOf(SourceContext, '.') + 1)}] [{@l:u3}] {@m}\n{@x}"), "/home/pi/SweatBotLog.txt")
         .CreateLogger();
 
     // Crucially important for Windows Service, otherwise working directory runs out of Windows\System32
@@ -26,6 +26,7 @@ try
     }
 
     IHost host = Host.CreateDefaultBuilder(args)
+        .UseSystemd()
         .UseSerilog()
         .ConfigureServices(services =>
         {

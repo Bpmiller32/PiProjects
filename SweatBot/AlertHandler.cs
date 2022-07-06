@@ -107,7 +107,7 @@ public class AlertHandler
             email.Subject = string.Format("Sever room temperature: {0:F2}*F 🌡️", compTempF);
             email.Body = new TextPart(TextFormat.Plain)
             {
-                Text = string.Format("The current temperature in the server room is {0:F2}*F which is above the max set threshold of {1:F2}*F\n\nSensor will continue polling every 10s. An additional alert email will be sent in 1 hour if the temperature is still above the max threshold.\n\nOther data\nTemp: {0:F2} *F 🌡️\nHumidity: {2:F2}% 💦\nPressure: {3:F2} hPa 💨\nLight: {4:F2} lux 💡", compTempF, maxTemp, sensorReader.Humidity, sensorReader.Pressure, sensorReader.Light)
+                Text = string.Format("The current temperature in the server room is {0:F2}*F which is above the set temp threshold of {1:F2}*F\n\nSensor will continue polling every 10s. An additional alert email will be sent in 1 hour if the temperature is still above the temp threshold.\n\nOther data\nTemp: {0:F2} *F 🌡️\nHumidity: {2:F2}% 💦\nPressure: {3:F2} hPa 💨\nLight: {4:F2} lux 💡", compTempF, maxTemp, sensorReader.Humidity, sensorReader.Pressure, sensorReader.Light)
             };
 
             // Send email using raf account

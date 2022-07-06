@@ -1,0 +1,19 @@
+# Locate in /etc/systemd/system/WorkerApp.service
+# systemctl daemon-reload -> refreshes service list
+# systemctl start WorkerApp.service -> starts\stops service
+# systemctl enable WorkerApp.service -> autostarts\disables on boot
+
+[Unit]
+Description=Temperature monitoring service for RAF server room
+
+[Service]
+Type=Notify
+ExecStart=/home/pi/SweatBot
+SyslogIdentifier=SweatBot
+
+User=pi
+WorkingDirectory=/home/pi
+Environment=DOTNET_ROOT=/home/pi/.dotnet
+
+[Install]
+WantedBy=multi-user.target
