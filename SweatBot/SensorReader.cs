@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using Python.Runtime;
 
 namespace SweatBot;

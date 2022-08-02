@@ -1,5 +1,3 @@
-using System.Diagnostics;
-
 namespace SweatBot;
 
 public class MasterService : BackgroundService
