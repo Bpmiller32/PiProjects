@@ -2,3 +2,10 @@
 **/.vscode/solution-explorer
 **/bin/
 **/obj/
+
+**/.local-chromium
+**/.DS_Store
+**/node_modules
+**/dist
+
+**/Log/
