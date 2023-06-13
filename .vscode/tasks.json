@@ -4,7 +4,7 @@
         {
             "label": "build",
             "type": "shell",
-            "command": "./../preBuild.ps1",
+            "command": "./../BuildScript.ps1",
         }
     ]
 }

@@ -4,6 +4,8 @@ namespace SweatBot;
 
 public class SensorReader
 {
+    public string PythonDll { get; set; }
+
     public double CompTempF { get; set; }
     public double Pressure { get; set; }
     public double Humidity { get; set; }
@@ -43,7 +45,7 @@ output = str(sensor.temp) + ',' + str(sensor.pressure) + ',' + str(sensor.humidi
         this.logger = logger;
     }
 
-    public async Task ExecuteAsync(CancellationToken stoppingToken)
+    public async Task ReadSensors(CancellationToken stoppingToken)
     {
         // Collect initial CPU temperate values
         logger.LogDebug("Getting average CPU temp over 5s.....");
@@ -58,14 +60,14 @@ output = str(sensor.temp) + ',' + str(sensor.pressure) + ',' + str(sensor.humidi
         while (!stoppingToken.IsCancellationRequested)
         {
             // Collect data from Enviro+
-            string test = (string)RunPythonCode
+            string sensorValuesRaw = (string)RunPythonCode
             (
                 pyCode: pythonCode,
                 returnedVariableName: "output"
             );
 
-            // Only able export primitive types from Python.Net so I sent back a delimited string to have only 1 Python execution, separate and assign values
-            string[] sensorValues = test.Split(',');
+            // Only able export primitive types from Python.Net so to have only 1 Python execution I send back a single delimited string, separate and assign values
+            string[] sensorValues = sensorValuesRaw.Split(',');
 
             double rawTemp = double.Parse(sensorValues[0]);
             Pressure = double.Parse(sensorValues[1]);
@@ -106,9 +108,9 @@ output = str(sensor.temp) + ',' + str(sensor.pressure) + ',' + str(sensor.humidi
         return double.Parse(cpuTempText) / 1000;
     }
 
-    private static object RunPythonCode(string pyCode, string returnedVariableName)
+    private object RunPythonCode(string pyCode, string returnedVariableName)
     {
-        Environment.SetEnvironmentVariable("PYTHONNET_PYDLL", "/usr/lib/arm-linux-gnueabihf/libpython3.9.so.1.0");
+        Environment.SetEnvironmentVariable("PYTHONNET_PYDLL", PythonDll);
         PythonEngine.Initialize();
 
         object returnedVariable = new();

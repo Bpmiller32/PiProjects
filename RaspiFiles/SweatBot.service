@@ -8,12 +8,12 @@ Description=Temperature monitoring service for RAF server room
 
 [Service]
 Type=Notify
-ExecStart=/home/pi/SweatBot
+ExecStart=/home/billy/SweatBot
 SyslogIdentifier=SweatBot
 
-User=pi
-WorkingDirectory=/home/pi
-Environment=DOTNET_ROOT=/home/pi/.dotnet
+User=billy
+WorkingDirectory=/home/billy
+Environment=DOTNET_ROOT=/home/billy/.dotnet
 
 [Install]
 WantedBy=multi-user.target

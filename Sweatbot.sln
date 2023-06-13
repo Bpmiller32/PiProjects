@@ -5,8 +5,6 @@ VisualStudioVersion = 16.0.30114.105
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SweatBot", "SweatBot\SweatBot.csproj", "{BFC20443-C876-41B6-8CF1-C71D26731E87}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CanaryServer", "CanaryServer\CanaryServer.csproj", "{836E9713-3BC7-412A-9676-ABA7897FED4A}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -20,9 +18,5 @@ Global
 		{BFC20443-C876-41B6-8CF1-C71D26731E87}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BFC20443-C876-41B6-8CF1-C71D26731E87}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BFC20443-C876-41B6-8CF1-C71D26731E87}.Release|Any CPU.Build.0 = Release|Any CPU
-		{836E9713-3BC7-412A-9676-ABA7897FED4A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{836E9713-3BC7-412A-9676-ABA7897FED4A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{836E9713-3BC7-412A-9676-ABA7897FED4A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{836E9713-3BC7-412A-9676-ABA7897FED4A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

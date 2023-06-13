@@ -1,8 +1,8 @@
 namespace SweatBot;
 
-public class MasterService : BackgroundService
+public class MainService : BackgroundService
 {
-    private readonly ILogger<MasterService> logger;
+    private readonly ILogger<MainService> logger;
     private readonly IConfiguration config;
     private readonly SensorReader sensorReader;
     private readonly AlertHandler alertHandler;
@@ -12,7 +12,7 @@ public class MasterService : BackgroundService
     private readonly int POLLING_RATE = 10;
     private readonly int NOTIFICATION_RATE = 3600;
 
-    public MasterService(ILogger<MasterService> logger, IConfiguration config, SensorReader sensorReader, AlertHandler alertHandler)
+    public MainService(ILogger<MainService> logger, IConfiguration config, SensorReader sensorReader, AlertHandler alertHandler)
     {
         this.logger = logger;
         this.config = config;
@@ -28,13 +28,22 @@ public class MasterService : BackgroundService
             return;
         }
 
-        // Kick off SensorReader, time to pull all info from sensor is ~8s
-        _ = Task.Run(() => sensorReader.ExecuteAsync(stoppingToken), stoppingToken);
+        // Grab valid values from appsettings.json, set for AlertHandler and SensorReader
+        double maxTemp = config.GetValue<double>("settings:maxTemp");
+        sensorReader.PythonDll = config.GetValue<string>("settings:pythonDll");
+        alertHandler.MaxTemp = maxTemp;
+        alertHandler.EmailListString = config.GetValue<string>("settings:destinationEmailList");
+        alertHandler.SenderEmailAddress = config.GetValue<string>("settings:senderEmailAddress");
+        alertHandler.SenderEmailPassword = config.GetValue<string>("settings:senderEmailPassword");
+
+        // Kick off SensorReader asynchonously, time to pull all info from sensor is ~8s
+        _ = Task.Run(() => sensorReader.ReadSensors(stoppingToken), stoppingToken);
 
         // Start main loop
         logger.LogInformation("✦✧✦✧✦✧✦✧✦✧✦✧✦✧✦✧✦✧✦✧");
         logger.LogInformation("Starting service, getting average CPU temp over 10s.....");
-        logger.LogDebug("I am running from: {System}", System.AppDomain.CurrentDomain.BaseDirectory);
+        logger.LogDebug("I am running from: {System}", AppDomain.CurrentDomain.BaseDirectory);
+
         while (!stoppingToken.IsCancellationRequested)
         {
             if (sensorReader.CompTempF == 0)
@@ -44,18 +53,10 @@ public class MasterService : BackgroundService
                 continue;
             }
 
-            // Grab temp threshold from appsettings.json, check if sensor reading is above threshold
-            double maxTemp = config.GetValue<double>("settings:maxTemp");
+            // Check if sensor reading is above threshold
             if (sensorReader.CompTempF > maxTemp)
             {
                 _ = alertHandler.RaiseAlert(nextNotification: NOTIFICATION_RATE);
-            }
-
-            // Check to see if canary service is enabled
-            bool canaryEnabled = config.GetValue<bool>("settings:canaryEnabled");
-            if (canaryEnabled)
-            {
-                _ = alertHandler.SendCanary();
             }
 
             await Task.Delay(TimeSpan.FromSeconds(POLLING_RATE), stoppingToken);
@@ -71,21 +72,26 @@ public class MasterService : BackgroundService
             {
                 throw new Exception("appsettings.json is missing, make sure there is a valid appsettings.json file in the same directory as the application");
             }
-            // Check emailList
-            if (string.IsNullOrEmpty(config.GetValue<string>("settings:emailList")))
-            {
-                throw new Exception("emailList value is either missing or invalid in appsettings.json");
-            }
             // Check maxTemp
-            double maxTemp = config.GetValue<double>("settings:maxTemp");
-            if (maxTemp == 0)
+            if (config.GetValue<double>("settings:maxTemp") == 0)
             {
                 throw new Exception("maxTemp value is either missing or invalid in appsettings.json");
+            }
+            // Check other settings
+            List<string> stringSettings = new() { "destinationEmailList", "pythonDll", "senderEmailAddress", "senderEmailPassword" };
+            foreach (string stringSetting in stringSettings)
+            {
+                string setting = string.Format("settings:{0}", stringSetting);
+
+                if (string.IsNullOrEmpty(config.GetValue<string>(setting)))
+                {
+                    throw new Exception(string.Format("{0} value is either missing or invalid in appsettings.json", setting));
+                }
             }
 
             return true;
         }
-        catch (System.Exception e)
+        catch (Exception e)
         {
             logger.LogError("{e}", e.Message);
             return false;

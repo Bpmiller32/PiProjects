@@ -2,15 +2,6 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "CanaryServer",
-            "type": "coreclr",
-            "logging": {"moduleLoad": false},
-            "request": "launch",
-            "preLaunchTask": "build",
-            "program": "${workspaceFolder}/CanaryServer/bin/Debug/net6.0/CanaryServer.dll",
-            "args": [],
-        },
-        {
             "name": "SweatBot",
             "type": "coreclr",
             "logging": {"moduleLoad": false},
@@ -29,10 +20,4 @@
             }
         },
     ],
-    "compounds": [
-        {
-            "name": "SweatBot + CanaryServer",
-            "configurations": ["CanaryServer", "SweatBot"]
-        }
-    ]
 }
