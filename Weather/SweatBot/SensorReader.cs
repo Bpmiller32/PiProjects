@@ -12,6 +12,7 @@ public class SensorReader
     public double Light { get; set; }
 
     private readonly ILogger<SensorReader> logger;
+    private readonly IConfiguration config;
     private readonly Queue<double> cpuTemps = new();
     private readonly string pythonCode =
 @"import time
@@ -40,9 +41,10 @@ for x in range(0, 5):
 
 output = str(sensor.temp) + ',' + str(sensor.pressure) + ',' + str(sensor.humidity) + ',' + str(sensor.light)";
 
-    public SensorReader(ILogger<SensorReader> logger)
+    public SensorReader(ILogger<SensorReader> logger, IConfiguration config)
     {
         this.logger = logger;
+        this.config = config;
     }
 
     public async Task ReadSensors(CancellationToken stoppingToken)
@@ -86,7 +88,7 @@ output = str(sensor.temp) + ',' + str(sensor.pressure) + ',' + str(sensor.humidi
             cpuTemps.Enqueue(GetCpuTemp());
 
             // Calculate compensated temperature
-            const double factor = 2.25;
+            double factor = config.GetValue<double>("settings:tuningFactor");
             double compTempC = rawTemp - ((averageCpuTemp - rawTemp) / factor);
             CompTempF = (compTempC * 9 / 5) + 32;
 
